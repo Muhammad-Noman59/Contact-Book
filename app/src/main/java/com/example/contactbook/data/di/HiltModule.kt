@@ -19,6 +19,6 @@ object HiltModule {
         return Room.databaseBuilder(application,
             ContactDatabase::class.java,
             "ContactApp.db"
-        ).build()
+        ).fallbackToDestructiveMigrationFrom(1,2).build()
     }
 }

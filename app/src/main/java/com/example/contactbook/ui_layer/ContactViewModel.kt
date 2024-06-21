@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.contactbook.data.database.Contact
 import com.example.contactbook.data.database.ContactDatabase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -19,6 +20,7 @@ import javax.inject.Inject
 class ContactViewModel @Inject constructor(val database: ContactDatabase) : ViewModel() {
 
     private var isSortByName = MutableStateFlow(false)
+    @OptIn(ExperimentalCoroutinesApi::class)
     private var contact = isSortByName.flatMapLatest {
 
         if (it) {
@@ -82,7 +84,8 @@ class ContactViewModel @Inject constructor(val database: ContactDatabase) : View
             number = state.value.number.value,
             gmail = state.value.gmail.value,
             dateOfCreation = System.currentTimeMillis(),
-            isActive = true
+            isActive = true,
+            image = state.value.image.value
         )
 
         viewModelScope.launch {
@@ -94,5 +97,6 @@ class ContactViewModel @Inject constructor(val database: ContactDatabase) : View
         state.value.number.value = ""
         state.value.gmail.value = ""
         state.value.dateOfCreation.value = 0
+        state.value.image.value = ByteArray(0)
     }
 }

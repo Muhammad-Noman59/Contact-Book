@@ -12,5 +12,6 @@ data class Contact(
     val number: String,
     val gmail: String,
     val dateOfCreation: Long,
-    val isActive : Boolean
+    val isActive : Boolean,
+    val image : ByteArray? = null
 )

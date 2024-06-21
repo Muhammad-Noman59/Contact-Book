@@ -12,5 +12,6 @@ data class ContactState (
     val name : MutableState<String> = mutableStateOf(""),
     val number : MutableState<String> = mutableStateOf(""),
     val gmail : MutableState<String> = mutableStateOf(""),
-    val dateOfCreation : MutableState<Long> = mutableStateOf(0)
+    val dateOfCreation : MutableState<Long> = mutableStateOf(0),
+    val image : MutableState<ByteArray> = mutableStateOf(ByteArray(0))
 )
