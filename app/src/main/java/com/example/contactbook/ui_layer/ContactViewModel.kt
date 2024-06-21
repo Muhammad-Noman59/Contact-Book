@@ -68,10 +68,11 @@ class ContactViewModel @Inject constructor(val database: ContactDatabase) : View
         }
 
         state.value.id.value = 0
-        state.value.name.value = ""
+        state.value.name.value =""
         state.value.number.value = ""
         state.value.gmail.value = ""
-        state.value.dateOfCreation.value =0
+        state.value.dateOfCreation.value = 0
+        state.value.image.value = ByteArray(0)
     }
 
 

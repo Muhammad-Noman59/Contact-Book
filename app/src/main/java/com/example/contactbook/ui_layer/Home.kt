@@ -1,5 +1,6 @@
 package com.example.contactbook.ui_layer
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -66,6 +67,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.contactbook.R
+import com.example.contactbook.components.ProfileImage
 import com.example.contactbook.data.database.Contact
 import com.example.contactbook.ui.theme.GrayColor
 import com.example.contactbook.ui.theme.PrimaryColor
@@ -81,24 +83,21 @@ fun Home(
 ) {
 
 
-
     val context = LocalContext.current
-
     val launcher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) {
-            uri : Uri?->
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
 
-            if (uri != null){
-                val inputStream : InputStream? = context.contentResolver.openInputStream(uri)
+            if (uri != null) {
+                val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
                 val byte = inputStream?.readBytes()
 
-                if (byte != null){
+                if (byte != null) {
                     state.image.value = byte
                 }
             }
         }
-
     var dialogShow by rememberSaveable { mutableStateOf(false) }
+    var isSortByName by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         containerColor = Color.White,
@@ -118,6 +117,7 @@ fun Home(
                             painter = painterResource(id = R.drawable.sort_icon),
                             contentDescription = " Sort Icon",
                             modifier = Modifier.clickable {
+                                isSortByName = !isSortByName
                                 viewModel.changeSorting()
                             }
                         )
@@ -155,20 +155,58 @@ fun Home(
             .background(color = Color.White)
 
     ) { innerPadding ->
-        LazyColumn(
+
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(color = Color.White)
                 .padding(innerPadding)
         ) {
-            items(state.contact) {
-                ShowContactCard(state = state, data = it, viewModel = viewModel, onEvent = onEvent)
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, bottom = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Sort By: ",
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                )
+
+                if (isSortByName) {
+
+                    Text(text = "Name")
+                } else {
+
+                    Text(text = "Date")
+                }
+
             }
 
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = Color.White)
+            ) {
+                items(state.contact) {
+
+                        ShowContactCard(
+                            state = state,
+                            data = it,
+                            viewModel = viewModel,
+                            onEvent = onEvent
+                        )
+
+                }
+
+            }
         }
     }
-
-    var bitmapImage : Bitmap? = null
+    var bitmapImage: Bitmap? = null
 
     if (state.image != null)
         bitmapImage = BitmapFactory.decodeByteArray(state.image.value, 0, state.image.value.size)
@@ -213,7 +251,7 @@ fun Home(
                                 ),
                             contentScale = ContentScale.FillBounds
                         )
-                    }else {
+                    } else {
 
                         Image(
                             painter = painterResource(id = R.drawable.add_image_icon),
@@ -222,7 +260,8 @@ fun Home(
                                 .size(50.dp)
                                 .clip(
                                     shape = CircleShape
-                                ).clickable {
+                                )
+                                .clickable {
                                     launcher.launch("image/*")
                                 }
 
@@ -317,7 +356,7 @@ fun Home(
                         CustomButton(btnTex = "Cancel", color = GrayColor) {
 
                             state.id.value = 0
-                            state.name.value =""
+                            state.name.value = ""
                             state.number.value = ""
                             state.gmail.value = ""
                             state.dateOfCreation.value = 0
@@ -346,7 +385,8 @@ fun ShowContactCard(
 
 ) {
 
-    var bitmapImage : Bitmap? = null
+
+    var bitmapImage: Bitmap? = null
 
     if (data.image != null)
         bitmapImage = BitmapFactory.decodeByteArray(data.image, 0, data.image.size)
@@ -389,16 +429,13 @@ fun ShowContactCard(
                     contentDescription = "Contact Image",
                     modifier = Modifier
                         .size(50.dp)
-                        .border(
-                            width = 2.dp,
-                            color = PrimaryColor,
-                            shape = CircleShape
-                        )
                         .clip(
                             shape = CircleShape
                         ),
-                    contentScale = ContentScale.FillBounds
+                    contentScale = ContentScale.Crop
                 )
+            } else {
+                ProfileImage(data.name)
             }
 
             Column(
@@ -545,7 +582,9 @@ fun ShowContactCard(
                     painter = painterResource(id = R.drawable.call_icon),
                     contentDescription = " Call Icon ",
                     modifier = Modifier.clickable {
-
+                        val intent = Intent(Intent.ACTION_CALL)
+                        intent.data = Uri.parse("tel:${data.number}")
+                        context.startActivity(intent)
                     }
                 )
             }
@@ -675,7 +714,7 @@ fun ShowContactCard(
                         CustomButton(btnTex = "Cancel", color = GrayColor) {
 
                             state.id.value = 0
-                            state.name.value =""
+                            state.name.value = ""
                             state.number.value = ""
                             state.gmail.value = ""
                             state.dateOfCreation.value = 0
