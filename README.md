@@ -19,7 +19,7 @@ https://github.com/Muhammad-Noman59/Contact-Book/assets/164490322/15e39ea2-8caa-
 - **Make Phone Calls**: Directly call a contact from the app.
 
 ## Technologies Used
-
+- **Kotlin:** The main programming language used to build the app.
 - **Dagger Hilt:** For dependency injection.
 - **Navigation Component:** For in-app navigation.
 - **Jetpack Compose:** For building the UI.
