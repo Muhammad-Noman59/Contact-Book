@@ -4,10 +4,9 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,6 +26,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
@@ -62,15 +62,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.contactbook.R
-import com.example.contactbook.components.ProfileImage
+import com.example.contactbook.utils.ProfileImage
 import com.example.contactbook.data.database.Contact
 import com.example.contactbook.ui.theme.GrayColor
 import com.example.contactbook.ui.theme.PrimaryColor
+import com.example.contactbook.utils.compressImage
 import java.io.InputStream
 
 
@@ -93,6 +94,15 @@ fun Home(
 
                 if (byte != null) {
                     state.image.value = byte
+
+                    val compressedImage = compressImage(byte)
+                    if (compressedImage.size > 1024 * 1024) { // 1MB
+                        Toast.makeText(context, "Image size is too large. Please choose a smaller image.", Toast.LENGTH_SHORT).show()
+                    } else {
+                        state.image.value = compressedImage
+
+                        Toast.makeText(context, "Image added", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
@@ -198,6 +208,7 @@ fun Home(
                             state = state,
                             data = it,
                             viewModel = viewModel,
+                            launcher = launcher,
                             onEvent = onEvent
                         )
 
@@ -241,17 +252,15 @@ fun Home(
                             contentDescription = "Contact Image",
                             modifier = Modifier
                                 .size(50.dp)
-                                .border(
-                                    width = 2.dp,
-                                    color = PrimaryColor,
-                                    shape = CircleShape
-                                )
                                 .clip(
                                     shape = CircleShape
-                                ),
+                                ).clickable {
+                                    launcher.launch("image/*")
+                                },
                             contentScale = ContentScale.FillBounds
                         )
-                    } else {
+                    }
+                    else {
 
                         Image(
                             painter = painterResource(id = R.drawable.add_image_icon),
@@ -301,6 +310,7 @@ fun Home(
                         onValueChange = {
                             state.number.value = it
                         },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.phone_icon),
@@ -334,6 +344,7 @@ fun Home(
                                 contentDescription = " Gmail Icon"
                             )
                         },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         placeholder = {
                             Text(text = "Enter gmail")
                         },
@@ -381,6 +392,7 @@ fun ShowContactCard(
     state: ContactState,
     data: Contact,
     viewModel: ContactViewModel,
+    launcher : ManagedActivityResultLauncher<String,Uri?>,
     onEvent: () -> Unit
 
 ) {
@@ -513,6 +525,7 @@ fun ShowContactCard(
                                             state.name.value = data.name
                                             state.gmail.value = data.gmail
                                             state.number.value = data.number
+                                            state.image.value = data.image!!
                                             dialogShow = true
                                             dropDownShow = false
 
@@ -544,6 +557,7 @@ fun ShowContactCard(
                                             state.name.value = data.name
                                             state.gmail.value = data.gmail
                                             state.number.value = data.number
+                                            state.image.value = data.image!!
                                             dropDownShow = false
                                             viewModel.deleteContact()
                                             Toast.makeText(
@@ -591,6 +605,11 @@ fun ShowContactCard(
         }
     }
 
+    var bitmapImage02: Bitmap? = null
+
+    if (state.image != null)
+        bitmapImage02 = BitmapFactory.decodeByteArray(state.image.value, 0, state.image.value.size)
+
 
     if (dialogShow) {
 
@@ -616,16 +635,27 @@ fun ShowContactCard(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    Image(
-                        painter = painterResource(id = R.drawable.add_image_icon),
-                        contentDescription = " Add Image Icon",
-                        modifier = Modifier
-                            .size(50.dp)
-                            .clip(
-                                shape = CircleShape
-                            )
+                    if (bitmapImage02 != null) {
+                        Image(
+                            bitmap = bitmapImage02.asImageBitmap(),
+                            contentDescription = "Contact Image",
+                            modifier = Modifier
+                                .size(50.dp)
+                                .clip(
+                                    shape = CircleShape
+                                ).clickable {
+                                    launcher.launch("image/*")
+                                },
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    else {
 
-                    )
+                        ProfileImage(data.name){
+                            launcher.launch("image/*")
+                        }
+
+                    }
 
                     TextField(
                         value = state.name.value,

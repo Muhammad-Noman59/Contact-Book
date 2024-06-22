@@ -16,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.rememberNavController
+import com.example.contactbook.navigation.NavGraph
 import com.example.contactbook.ui.theme.ContactBookTheme
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,6 +32,7 @@ class MainActivity : ComponentActivity() {
 
             val viewModel = hiltViewModel<ContactViewModel>()
             val state = viewModel.state.collectAsState().value
+            val navHostController = rememberNavController()
 
             ContactBookTheme {
                 Scaffold(
@@ -39,7 +42,8 @@ class MainActivity : ComponentActivity() {
                         .background(color = Color.White)
                 ) { innerPadding ->
                     innerPadding
-                    Home(
+                    NavGraph (
+                        navHostController = navHostController,
                         state = state,
                         viewModel = viewModel
                     ) {

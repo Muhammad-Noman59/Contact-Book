@@ -69,34 +69,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-
-//    // Dagar Hilt
-//    implementation("com.google.dagger:hilt-android:2.44")
-//    kapt("com.google.dagger:hilt-android-compiler:2.44")
-//
-//
-//    // Room Database
-//    val room_version = "2.6.1"
-//
-//    implementation("androidx.room:room-runtime:$room_version")
-//    annotationProcessor("androidx.room:room-compiler:$room_version")
-//    implementation("androidx.room:room-guava:$room_version")
-//
-//    // To use Kotlin Symbol Processing (KAPT)
-//    kapt("androidx.room:room-compiler:$room_version")
-//
-//
-//    // Hilt ViewModel
-//    implementation("androidx.hilt:hilt-compiler:1.2.0")
-//    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-//
-//
-//    // Navigation
-//    val nav_version = "2.7.7"
-//    implementation("androidx.navigation:navigation-compose:$nav_version")
-
-
-
     val room_version = "2.6.1"
 
     implementation("androidx.room:room-runtime:$room_version")

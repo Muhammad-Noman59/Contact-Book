@@ -1,6 +1,7 @@
-package com.example.contactbook.components
+package com.example.contactbook.utils
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -17,7 +18,7 @@ import kotlin.random.Random
 
 
 @Composable
-fun ProfileImage(name: String) {
+fun ProfileImage(name: String, onClick: () -> Unit = {Unit}) {
 
     val firstLetter = name.first().toString()
     val backgroundColor = Color(Random.nextInt(256), Random.nextInt(256), Random.nextInt(256))
@@ -26,6 +27,9 @@ fun ProfileImage(name: String) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
+            .clickable {
+                onClick()
+            }
             .size(50.dp)
             .background(color = backgroundColor, shape = CircleShape)
     ) {
